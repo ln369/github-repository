@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace= "com.cn.ln.Dao.IJobDao">
+
+    <select id="selectJob" resultType="Job">
+        select id,name,remark from job_inf
+        <where>
+            <if test="name!=null and name!=''" >
+               name like "%"#{name}"%"
+            </if>
+
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="selectJobCount" resultType="int">
+        select count(*) from job_inf
+        <where>
+            <if test="name!=null and name!=''">
+               name like "%"#{name}"%"
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertJob">
+        insert into job_inf(name,remark) VALUES (#{name},#{remark})
+    </insert>
+    <select id="selectJobById" resultType="Job">
+        select * from job_inf where id=#{id}
+    </select>
+
+    <update id="modifyJob">
+        update job_inf
+        set name=#{name},remark=#{remark}
+        where id=#{id}
+    </update>
+    <delete id="deleteJobById">
+        delete from job_inf where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

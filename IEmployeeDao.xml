@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.ln.Dao.IEmployeeDao">
+    <select id="selectAllDept" resultType="Dept">
+        select * from dept_inf
+    </select>
+    <select id="selectAllJob" resultType="Job">
+        select * from job_inf
+    </select>
+
+    <select id="selectDeptById" resultType="Dept">
+        select * from dept_inf where id = #{id}
+    </select>
+    <select id="selectJobById" resultType="Job">
+        select * from job_inf where id = #{id}
+    </select>
+    <resultMap id="employeeMap" type="Employee">
+        <id column="id" property="id"/>
+        <association property="dept"
+                     javaType="Dept"
+                     select="selectDeptById"
+                     column="dept_id"/>
+        <association property="job"
+                     javaType="Job"
+                     select="selectJobById"
+                     column="job_id"/>
+    </resultMap>
+
+    <select id="selectEmployee" resultMap="employeeMap">
+        select * from employee_inf
+        <where>
+            <if test="employee.job != null">
+                job_id = #{employee.job.id}
+            </if>
+            <if test="employee.name != null and employee.name != ''">
+                and name like '%' #{employee.name} '%'
+            </if>
+            <if test="employee.card_id != null and employee.card_id != ''">
+                and card_id like '%' #{employee.card_id} '%'
+            </if>
+            <if test="employee.sex != 0">
+                and sex = #{employee.sex}
+            </if>
+            <if test="employee.phone != null and employee.phone != ''">
+                and phone = #{employee.phone}
+            </if>
+            <if test="employee.dept != null">
+                and dept_id = #{employee.dept.id}
+            </if>
+        </where>
+        limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+    </select>
+
+    <select id="selectEmployeeCount" resultType="int">
+        select count(*) from employee_inf
+        <where>
+            <if test="job != null">
+                job_id = #{job.id}
+            </if>
+            <if test="name != null and name != ''">
+                and name like '%' #{name} '%'
+            </if>
+            <if test="card_id != null and card_id != ''">
+                and card_id like '%' #{card_id} '%'
+            </if>
+            <if test="sex != 0">
+                and sex = #{sex}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="dept != null">
+                and dept_id = #{dept.id}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectEmployeeById" resultMap="employeeMap">
+        select * from employee_inf where id = #{id}
+    </select>
+
+    <update id="updateEmployee">
+        update employee_inf set
+        dept_id=#{dept.id},job_id=#{job.id},
+        name=#{name},card_id=#{card_id},
+        address=#{address},post_code=#{post_code},
+        tel=#{tel},phone=${phone},qq_num=${qq_num},
+        email=#{email},sex=#{sex},party=#{party},
+        birthday=#{birthday},race=#{race},
+        education=#{education},speciality=#{speciality},
+        hobby=#{hobby},remark=#{remark}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEmployee">
+        delete from employee_inf where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="insertEmployee">
+        insert into employee_inf (dept_id,job_id,name,card_id,
+        address,post_code,tel,phone,qq_num,email,sex,party,
+        birthday,race,education,speciality,hobby,remark)
+        values (#{dept.id},#{job.id},#{name},#{card_id},
+        #{address},#{post_code},#{tel},#{phone},#{qq_num},#{email},#{sex},#{party},
+        #{birthday},#{race},#{education},#{speciality},#{hobby},#{remark})
+    </insert>
+
+</mapper>
